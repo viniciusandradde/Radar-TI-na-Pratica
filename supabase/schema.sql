@@ -61,3 +61,44 @@ create policy "owner manages sources" on public.sources for all to authenticated
 
 -- O collector faz upsert usando service_role no ambiente GitHub Actions.
 -- Configure Auth > Users e copie o UUID do usuário editor para o secret VSA_OWNER_ID.
+
+-- VSA Radar Leads + email audit (execute junto ao schema existente)
+create table if not exists public.leads (
+ id uuid primary key default gen_random_uuid(),
+ owner_id uuid not null references auth.users(id) on delete cascade,
+ name text not null default '',
+ email text,
+ phone text,
+ company text,
+ niche text not null default 'Não classificado',
+ temperature text not null default 'cold' check (temperature in ('hot','warm','cold')),
+ role text,
+ source text,
+ consent_status text not null default 'unknown' check (consent_status in ('opted_in','legitimate_interest_reviewed','unknown','opted_out')),
+ consent_basis text,
+ status text not null default 'new' check (status in ('new','contacted','qualified','customer','do_not_contact')),
+ notes text,
+ created_at timestamptz not null default now(),
+ updated_at timestamptz not null default now()
+);
+create unique index if not exists leads_owner_email_unique on public.leads(owner_id, lower(email)) where email is not null and email <> '';
+create index if not exists leads_owner_niche_temperature_idx on public.leads(owner_id,niche,temperature);
+alter table public.leads enable row level security;
+drop policy if exists "owner manages leads" on public.leads;
+create policy "owner manages leads" on public.leads for all to authenticated using(auth.uid()=owner_id) with check(auth.uid()=owner_id);
+
+create table if not exists public.lead_email_log (
+ id uuid primary key default gen_random_uuid(),
+ owner_id uuid not null references auth.users(id) on delete cascade,
+ lead_id uuid not null references public.leads(id) on delete cascade,
+ provider text not null default 'resend',
+ provider_message_id text,
+ recipient text not null,
+ subject text not null,
+ status text not null default 'sent',
+ sent_at timestamptz not null default now()
+);
+alter table public.lead_email_log enable row level security;
+drop policy if exists "owner reads lead email log" on public.lead_email_log;
+create policy "owner reads lead email log" on public.lead_email_log for select to authenticated using(auth.uid()=owner_id);
+-- Inserts no log são realizados somente pela Edge Function com service role.
