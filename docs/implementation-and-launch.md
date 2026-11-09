@@ -68,3 +68,13 @@ O workflow `.github/workflows/pages.yml` publica o diretório `site/` quando alt
 3. Ajustar UI para gravar/editar status de notícias no Supabase (o MVP lê notícias e salva rascunhos).
 4. Criar templates visuais Canva e definir Brand Kit.
 5. Só depois de aprovação e validação dos perfis, avaliar conectores oficiais de publicação social.
+
+
+## CRM de leads e Resend
+
+- O módulo Radar de Leads importa CSV, segmenta por nicho e temperatura (quente/morno/frio), filtra por status e prepara mensagens individualizadas por contexto.
+- Modelo CSV: `name,email,phone,company,niche,temperature,role,source,consent_status,consent_basis,status,notes`.
+- Leads podem ser persistidos no Supabase na tabela `leads`; a auditoria de e-mail fica em `lead_email_log`.
+- A integração Resend usa a Supabase Edge Function `send-lead-email`; configurar `RESEND_API_KEY` e `RESEND_FROM_EMAIL` como secrets da função e verificar o domínio no Resend.
+- O envio é individual, autenticado e exige opt-in ou legítimo interesse documentado/revisado. Leads com opt-out ou status de não contatar são bloqueados. Não existe disparo em massa nesta versão.
+- O frontend não contém API key do Resend. A configuração da conta Resend não é acessada diretamente pelo GitHub connector; a chave existente deve ser cadastrada como secret no Supabase.
