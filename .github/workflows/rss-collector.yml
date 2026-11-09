@@ -1,7 +1,7 @@
 name: VSA Radar RSS Collector
 on:
   schedule:
-    - cron: "15 13 * * *" # 10:15 America/Campo_Grande (UTC-3); adjust for daylight/region policy.
+    - cron: "15 14 * * *" # 10:15 America/Campo_Grande (UTC-4; no daylight saving).
   workflow_dispatch:
 permissions:
   contents: read
