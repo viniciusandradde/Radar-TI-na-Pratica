@@ -1,0 +1,17 @@
+[
+  {"name":"Reuters Technology","homepage_url":"https://www.reuters.com/technology/","feed_url":"","category":"Mercado & Estratégia","enabled":true},
+  {"name":"MIT Technology Review","homepage_url":"https://www.technologyreview.com/","feed_url":"","category":"Inteligência Artificial","enabled":true},
+  {"name":"IEEE Spectrum","homepage_url":"https://spectrum.ieee.org/","feed_url":"","category":"Infraestrutura & Cloud","enabled":true},
+  {"name":"IT Forum","homepage_url":"https://itforum.com.br/","feed_url":"","category":"Mercado & Estratégia","enabled":true},
+  {"name":"Convergência Digital","homepage_url":"https://convergenciadigital.com.br/","feed_url":"","category":"Infraestrutura & Cloud","enabled":true},
+  {"name":"Baguete","homepage_url":"https://www.baguete.com.br/","feed_url":"","category":"Mercado & Estratégia","enabled":true},
+  {"name":"CERT.br","homepage_url":"https://cert.br/","feed_url":"","category":"Cibersegurança","enabled":true},
+  {"name":"CTIR Gov","homepage_url":"https://www.gov.br/gsi/pt-br/assuntos/ctir/","feed_url":"","category":"Cibersegurança","enabled":true},
+  {"name":"CISA","homepage_url":"https://www.cisa.gov/news-events/cybersecurity-advisories","feed_url":"","category":"Cibersegurança","enabled":true},
+  {"name":"NIST","homepage_url":"https://www.nist.gov/news-events","feed_url":"","category":"ITSM & Governança","enabled":true},
+  {"name":"ANPD","homepage_url":"https://www.gov.br/anpd/","feed_url":"","category":"ITSM & Governança","enabled":true},
+  {"name":"Stanford HAI","homepage_url":"https://hai.stanford.edu/","feed_url":"","category":"Inteligência Artificial","enabled":true},
+  {"name":"DORA Research","homepage_url":"https://dora.dev/research/","feed_url":"","category":"DevOps & SRE","enabled":true},
+  {"name":"ISACA","homepage_url":"https://www.isaca.org/resources/news-and-trends","feed_url":"","category":"ITSM & Governança","enabled":true},
+  {"name":"CNCF","homepage_url":"https://www.cncf.io/blog/","feed_url":"","category":"Infraestrutura & Cloud","enabled":true}
+]
