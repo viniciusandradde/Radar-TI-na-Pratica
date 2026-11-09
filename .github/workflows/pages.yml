@@ -20,10 +20,24 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Validate frontend
+        run: |
+          test -s site/index.html
+          test -s site/styles.css
+          test -s site/app.js
+          test -s site/config.js
+          node --check site/app.js
+          if grep -Eq 'SUPABASE_URL: *""|SUPABASE_ANON_KEY: *""' site/config.js; then
+            echo "::warning::Supabase browser configuration is still empty; the app will run in local-only mode."
+          fi
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
         with:
           path: "./site"
-      - id: deployment
+      - name: Deploy to GitHub Pages
+        id: deployment
         uses: actions/deploy-pages@v4
