@@ -1,17 +1,340 @@
 [
-  {"name":"Reuters Technology","homepage_url":"https://www.reuters.com/technology/","feed_url":"","category":"Mercado & Estratégia","enabled":true},
-  {"name":"MIT Technology Review","homepage_url":"https://www.technologyreview.com/","feed_url":"","category":"Inteligência Artificial","enabled":true},
-  {"name":"IEEE Spectrum","homepage_url":"https://spectrum.ieee.org/","feed_url":"","category":"Infraestrutura & Cloud","enabled":true},
-  {"name":"IT Forum","homepage_url":"https://itforum.com.br/","feed_url":"","category":"Mercado & Estratégia","enabled":true},
-  {"name":"Convergência Digital","homepage_url":"https://convergenciadigital.com.br/","feed_url":"","category":"Infraestrutura & Cloud","enabled":true},
-  {"name":"Baguete","homepage_url":"https://www.baguete.com.br/","feed_url":"","category":"Mercado & Estratégia","enabled":true},
-  {"name":"CERT.br","homepage_url":"https://cert.br/","feed_url":"","category":"Cibersegurança","enabled":true},
-  {"name":"CTIR Gov","homepage_url":"https://www.gov.br/gsi/pt-br/assuntos/ctir/","feed_url":"","category":"Cibersegurança","enabled":false,"disabled_reason":"Desativada em 2026-11-13: a descoberta automática encontra o feed geral do portal gov.br (/rss.xml), não o do órgão. Reativar só com feed_url próprio verificado."},
-  {"name":"CISA","homepage_url":"https://www.cisa.gov/news-events/cybersecurity-advisories","feed_url":"","category":"Cibersegurança","enabled":true},
-  {"name":"NIST","homepage_url":"https://www.nist.gov/news-events","feed_url":"","category":"ITSM & Governança","enabled":true},
-  {"name":"ANPD","homepage_url":"https://www.gov.br/anpd/","feed_url":"","category":"ITSM & Governança","enabled":false,"disabled_reason":"Desativada em 2026-11-13: a descoberta automática encontra o feed geral do portal gov.br (/rss.xml), não o do órgão. Reativar só com feed_url próprio verificado."},
-  {"name":"Stanford HAI","homepage_url":"https://hai.stanford.edu/","feed_url":"","category":"Inteligência Artificial","enabled":true},
-  {"name":"DORA Research","homepage_url":"https://dora.dev/research/","feed_url":"","category":"DevOps & SRE","enabled":true},
-  {"name":"ISACA","homepage_url":"https://www.isaca.org/resources/news-and-trends","feed_url":"","category":"ITSM & Governança","enabled":true},
-  {"name":"CNCF","homepage_url":"https://www.cncf.io/blog/","feed_url":"","category":"Infraestrutura & Cloud","enabled":true}
+  {
+    "name": "Reuters Technology",
+    "homepage_url": "https://www.reuters.com/technology/",
+    "feed_url": "",
+    "category": "Mercado & Estratégia",
+    "enabled": true,
+    "papel": "descoberta"
+  },
+  {
+    "name": "MIT Technology Review",
+    "homepage_url": "https://www.technologyreview.com/",
+    "feed_url": "",
+    "category": "Inteligência Artificial",
+    "enabled": true,
+    "papel": "descoberta"
+  },
+  {
+    "name": "IEEE Spectrum",
+    "homepage_url": "https://spectrum.ieee.org/",
+    "feed_url": "",
+    "category": "Infraestrutura & Cloud",
+    "enabled": true,
+    "papel": "descoberta"
+  },
+  {
+    "name": "IT Forum",
+    "homepage_url": "https://itforum.com.br/",
+    "feed_url": "",
+    "category": "Mercado & Estratégia",
+    "enabled": true,
+    "papel": "descoberta"
+  },
+  {
+    "name": "Convergência Digital",
+    "homepage_url": "https://convergenciadigital.com.br/",
+    "feed_url": "",
+    "category": "Infraestrutura & Cloud",
+    "enabled": true,
+    "papel": "descoberta"
+  },
+  {
+    "name": "Baguete",
+    "homepage_url": "https://www.baguete.com.br/",
+    "feed_url": "",
+    "category": "Mercado & Estratégia",
+    "enabled": true,
+    "papel": "descoberta"
+  },
+  {
+    "name": "CERT.br",
+    "homepage_url": "https://cert.br/",
+    "feed_url": "",
+    "category": "Cibersegurança",
+    "enabled": true,
+    "papel": "primaria"
+  },
+  {
+    "name": "CTIR Gov",
+    "homepage_url": "https://www.gov.br/gsi/pt-br/assuntos/ctir/",
+    "feed_url": "",
+    "category": "Cibersegurança",
+    "enabled": false,
+    "disabled_reason": "Desativada em 2026-11-13: a descoberta automática encontra o feed geral do portal gov.br (/rss.xml), não o do órgão. Reativar só com feed_url próprio verificado.",
+    "papel": "primaria"
+  },
+  {
+    "name": "CISA",
+    "homepage_url": "https://www.cisa.gov/news-events/cybersecurity-advisories",
+    "feed_url": "",
+    "category": "Cibersegurança",
+    "enabled": true,
+    "papel": "primaria"
+  },
+  {
+    "name": "NIST",
+    "homepage_url": "https://www.nist.gov/news-events",
+    "feed_url": "",
+    "category": "ITSM & Governança",
+    "enabled": true,
+    "papel": "primaria"
+  },
+  {
+    "name": "ANPD",
+    "homepage_url": "https://www.gov.br/anpd/",
+    "feed_url": "",
+    "category": "ITSM & Governança",
+    "enabled": false,
+    "disabled_reason": "Desativada em 2026-11-13: a descoberta automática encontra o feed geral do portal gov.br (/rss.xml), não o do órgão. Reativar só com feed_url próprio verificado.",
+    "papel": "primaria"
+  },
+  {
+    "name": "Stanford HAI",
+    "homepage_url": "https://hai.stanford.edu/",
+    "feed_url": "",
+    "category": "Inteligência Artificial",
+    "enabled": true,
+    "papel": "primaria"
+  },
+  {
+    "name": "DORA Research",
+    "homepage_url": "https://dora.dev/research/",
+    "feed_url": "",
+    "category": "DevOps & SRE",
+    "enabled": true,
+    "papel": "primaria"
+  },
+  {
+    "name": "ISACA",
+    "homepage_url": "https://www.isaca.org/resources/news-and-trends",
+    "feed_url": "",
+    "category": "ITSM & Governança",
+    "enabled": true,
+    "papel": "primaria"
+  },
+  {
+    "name": "CNCF",
+    "homepage_url": "https://www.cncf.io/blog/",
+    "feed_url": "",
+    "category": "Infraestrutura & Cloud",
+    "enabled": true,
+    "papel": "primaria"
+  },
+  {
+    "name": "OpenAI",
+    "homepage_url": "https://openai.com/news/",
+    "feed_url": "https://openai.com/news/rss.xml",
+    "category": "IA · Fabricantes",
+    "enabled": true,
+    "papel": "primaria"
+  },
+  {
+    "name": "Google AI",
+    "homepage_url": "https://blog.google/technology/ai/",
+    "feed_url": "https://blog.google/technology/ai/rss/",
+    "category": "IA · Fabricantes",
+    "enabled": true,
+    "papel": "primaria"
+  },
+  {
+    "name": "Google DeepMind",
+    "homepage_url": "https://deepmind.google/blog/",
+    "feed_url": "https://deepmind.google/blog/rss.xml",
+    "category": "IA · Fabricantes",
+    "enabled": true,
+    "papel": "primaria"
+  },
+  {
+    "name": "Microsoft AI",
+    "homepage_url": "https://news.microsoft.com/source/topics/ai/",
+    "feed_url": "https://news.microsoft.com/source/topics/ai/feed/",
+    "category": "IA · Fabricantes",
+    "enabled": true,
+    "papel": "primaria"
+  },
+  {
+    "name": "Mistral AI",
+    "homepage_url": "https://mistral.ai/news/",
+    "feed_url": "https://mistral.ai/rss.xml",
+    "category": "IA · Fabricantes",
+    "enabled": true,
+    "papel": "primaria"
+  },
+  {
+    "name": "NVIDIA",
+    "homepage_url": "https://blogs.nvidia.com/",
+    "feed_url": "https://blogs.nvidia.com/feed/",
+    "category": "IA · Fabricantes",
+    "enabled": true,
+    "papel": "primaria"
+  },
+  {
+    "name": "AWS Machine Learning",
+    "homepage_url": "https://aws.amazon.com/blogs/machine-learning/",
+    "feed_url": "https://aws.amazon.com/blogs/machine-learning/feed/",
+    "category": "IA · Fabricantes",
+    "enabled": true,
+    "papel": "primaria"
+  },
+  {
+    "name": "Cloudflare AI",
+    "homepage_url": "https://blog.cloudflare.com/tag/ai/",
+    "feed_url": "https://blog.cloudflare.com/tag/ai/rss/",
+    "category": "IA · Fabricantes",
+    "enabled": true,
+    "papel": "primaria"
+  },
+  {
+    "name": "Anthropic Claude Code (versões)",
+    "homepage_url": "https://github.com/anthropics/claude-code/releases",
+    "feed_url": "https://github.com/anthropics/claude-code/releases.atom",
+    "category": "IA · Fabricantes",
+    "enabled": true,
+    "papel": "primaria"
+  },
+  {
+    "name": "Anthropic SDK (versões)",
+    "homepage_url": "https://github.com/anthropics/anthropic-sdk-python/releases",
+    "feed_url": "https://github.com/anthropics/anthropic-sdk-python/releases.atom",
+    "category": "IA · Fabricantes",
+    "enabled": true,
+    "papel": "primaria"
+  },
+  {
+    "name": "GitHub Changelog",
+    "homepage_url": "https://github.blog/changelog/",
+    "feed_url": "https://github.blog/changelog/feed/",
+    "category": "IA · Fabricantes",
+    "enabled": true,
+    "papel": "primaria"
+  },
+  {
+    "name": "Google Research",
+    "homepage_url": "https://research.google/blog/",
+    "feed_url": "https://research.google/blog/rss/",
+    "category": "IA · Pesquisa",
+    "enabled": true,
+    "papel": "primaria"
+  },
+  {
+    "name": "Microsoft Research",
+    "homepage_url": "https://www.microsoft.com/en-us/research/",
+    "feed_url": "https://www.microsoft.com/en-us/research/feed/",
+    "category": "IA · Pesquisa",
+    "enabled": true,
+    "papel": "primaria"
+  },
+  {
+    "name": "arXiv cs.MA (multiagentes)",
+    "homepage_url": "https://arxiv.org/list/cs.MA/recent",
+    "feed_url": "https://rss.arxiv.org/rss/cs.MA",
+    "category": "IA · Pesquisa",
+    "enabled": true,
+    "papel": "primaria"
+  },
+  {
+    "name": "arXiv cs.AI",
+    "homepage_url": "https://arxiv.org/list/cs.AI/recent",
+    "feed_url": "https://rss.arxiv.org/rss/cs.AI",
+    "category": "IA · Pesquisa",
+    "enabled": true,
+    "papel": "primaria"
+  },
+  {
+    "name": "Nature Machine Intelligence",
+    "homepage_url": "https://www.nature.com/natmachintell/",
+    "feed_url": "https://www.nature.com/natmachintell.rss",
+    "category": "IA · Pesquisa",
+    "enabled": true,
+    "papel": "primaria"
+  },
+  {
+    "name": "npj Digital Medicine",
+    "homepage_url": "https://www.nature.com/npjdigitalmed/",
+    "feed_url": "https://www.nature.com/npjdigitalmed.rss",
+    "category": "IA · Saúde",
+    "enabled": true,
+    "papel": "primaria"
+  },
+  {
+    "name": "Hugging Face",
+    "homepage_url": "https://huggingface.co/blog",
+    "feed_url": "https://huggingface.co/blog/feed.xml",
+    "category": "IA · Open source",
+    "enabled": true,
+    "papel": "primaria"
+  },
+  {
+    "name": "Ollama",
+    "homepage_url": "https://ollama.com/blog",
+    "feed_url": "https://ollama.com/blog/rss.xml",
+    "category": "IA · Open source",
+    "enabled": true,
+    "papel": "primaria"
+  },
+  {
+    "name": "GitHub AI & ML",
+    "homepage_url": "https://github.blog/ai-and-ml/",
+    "feed_url": "https://github.blog/ai-and-ml/feed/",
+    "category": "IA · Open source",
+    "enabled": true,
+    "papel": "primaria"
+  },
+  {
+    "name": "Meta Engineering (ML)",
+    "homepage_url": "https://engineering.fb.com/category/ml-applications/",
+    "feed_url": "https://engineering.fb.com/category/ml-applications/feed/",
+    "category": "IA · Open source",
+    "enabled": true,
+    "papel": "primaria"
+  },
+  {
+    "name": "Hacker News (IA, 150+ pontos)",
+    "homepage_url": "https://news.ycombinator.com/",
+    "feed_url": "https://hnrss.org/newest?q=AI+OR+LLM+OR+agents&points=150",
+    "category": "IA · Comunidade",
+    "enabled": true,
+    "papel": "descoberta"
+  },
+  {
+    "name": "Product Hunt",
+    "homepage_url": "https://www.producthunt.com/",
+    "feed_url": "https://www.producthunt.com/feed",
+    "category": "IA · Comunidade",
+    "enabled": true,
+    "papel": "descoberta"
+  },
+  {
+    "name": "Simon Willison",
+    "homepage_url": "https://simonwillison.net/",
+    "feed_url": "https://simonwillison.net/atom/everything/",
+    "category": "IA · Comunidade",
+    "enabled": true,
+    "papel": "descoberta"
+  },
+  {
+    "name": "Latent Space",
+    "homepage_url": "https://www.latent.space/",
+    "feed_url": "https://www.latent.space/feed",
+    "category": "IA · Comunidade",
+    "enabled": true,
+    "papel": "descoberta"
+  },
+  {
+    "name": "Import AI",
+    "homepage_url": "https://importai.substack.com/",
+    "feed_url": "https://importai.substack.com/feed",
+    "category": "IA · Comunidade",
+    "enabled": true,
+    "papel": "descoberta"
+  },
+  {
+    "name": "The Decoder",
+    "homepage_url": "https://the-decoder.com/",
+    "feed_url": "https://the-decoder.com/feed/",
+    "category": "IA · Comunidade",
+    "enabled": true,
+    "papel": "descoberta"
+  }
 ]
