@@ -142,3 +142,18 @@ Começar com 15 fontes prioritárias, equilibradas entre Brasil, mundo e fontes 
 15. CNCF
 
 Fontes adicionais entram quando o tema exigir. O Radar ITSM permanece como referência editorial de descoberta, não como fonte primária nem como molde de redação.
+
+## 10. Fontes de IA (diretriz do Radar de inovação, 18/11/2026)
+
+Pela diretriz editorial suprema (vsa-media-desk, `docs/metodologia/DIRETRIZ-RADAR-DE-INOVACAO-IA.md`), o Radar passa a
+monitorar inteligência artificial como foco. As 15 fontes do núcleo anterior continuam, com **peso menor** na nota do Media Desk.
+
+Cada fonte em `collector/sources.json` tem o campo `papel`:
+- `primaria`: fabricante, periódico, repositório ou órgão oficial. Pode sustentar uma afirmação.
+- `descoberta`: comunidade, agregador ou imprensa. Serve para achar a pauta; a fonte primária é aberta antes de publicar.
+
+Categorias novas: `IA · Fabricantes`, `IA · Pesquisa`, `IA · Open source`, `IA · Saúde` (primárias) e `IA · Comunidade` (descoberta).
+Todos os feeds foram testados em 18/11/2026.
+
+Lacunas conhecidas: Anthropic e Meta AI não publicam feed do blog (a Anthropic entra pelas notas de versão no GitHub); as notas de
+versão do ChatGPT, do Claude e do Gemini não têm feed. Essas lacunas são cobertas pela pesquisa na internet do Media Desk.
