@@ -32,6 +32,28 @@ services:
       timeout: 5s
       retries: 10
 
+  # RSSHub: gera RSS para sites sem feed (Anthropic, Cohere, LangChain, The Batch).
+  # Só na rede interna do compose; nenhuma porta no host.
+  radar-rsshub:
+    image: diygod/rsshub:latest
+    restart: unless-stopped
+    mem_limit: 384m
+    cpus: 0.5
+    logging: *logging
+    environment:
+      NODE_ENV: production
+      CACHE_TYPE: memory
+      CACHE_EXPIRE: "1800"
+      CACHE_CONTENT_EXPIRE: "3600"
+      NODE_OPTIONS: --max-old-space-size=256
+      TZ: America/Sao_Paulo
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS -o /dev/null http://127.0.0.1:1200/healthz || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
   radar-scheduler:
     build:
       context: ..
@@ -43,6 +65,8 @@ services:
     depends_on:
       radar-db:
         condition: service_healthy
+      radar-rsshub:
+        condition: service_started
     environment:
       RADAR_DATABASE_URL: postgresql://radar_app:${RADAR_APP_PASSWORD}@radar-db:5432/vsa_radar
       COLLECT_MINUTE: "15"

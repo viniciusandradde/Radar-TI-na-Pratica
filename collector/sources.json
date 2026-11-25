@@ -696,5 +696,84 @@
     "category": "IA · Comunidade",
     "enabled": true,
     "papel": "descoberta"
+  },
+  {
+    "name": "Anthropic — News",
+    "homepage_url": "https://www.anthropic.com/news",
+    "feed_url": "http://radar-rsshub:1200/anthropic/news",
+    "category": "IA · Fabricantes",
+    "papel": "primaria",
+    "via": "rsshub",
+    "enabled": true
+  },
+  {
+    "name": "Anthropic — Engineering",
+    "homepage_url": "https://www.anthropic.com/engineering",
+    "feed_url": "http://radar-rsshub:1200/anthropic/engineering",
+    "category": "IA · Fabricantes",
+    "papel": "primaria",
+    "via": "rsshub",
+    "enabled": true
+  },
+  {
+    "name": "Anthropic — Research",
+    "homepage_url": "https://www.anthropic.com/research",
+    "feed_url": "http://radar-rsshub:1200/anthropic/research",
+    "category": "IA · Pesquisa",
+    "papel": "primaria",
+    "via": "rsshub",
+    "enabled": true
+  },
+  {
+    "name": "Cohere Blog",
+    "homepage_url": "https://cohere.com/blog",
+    "feed_url": "http://radar-rsshub:1200/cohere/blog",
+    "category": "IA · Fabricantes",
+    "papel": "primaria",
+    "via": "rsshub",
+    "enabled": true
+  },
+  {
+    "name": "LangChain Blog",
+    "homepage_url": "https://blog.langchain.com/",
+    "feed_url": "http://radar-rsshub:1200/langchain/blog",
+    "category": "IA · Open source",
+    "papel": "primaria",
+    "via": "rsshub",
+    "enabled": true
+  },
+  {
+    "name": "xAI News",
+    "homepage_url": "https://x.ai/news",
+    "type": "sitemap",
+    "sitemap_url": "https://x.ai/sitemap.xml",
+    "path_prefix": "/news/",
+    "category": "IA · Fabricantes",
+    "papel": "primaria",
+    "enabled": true
+  },
+  {
+    "name": "Stanford HAI",
+    "homepage_url": "https://hai.stanford.edu/",
+    "type": "sitemap",
+    "sitemap_url": "https://hai.stanford.edu/sitemap.xml",
+    "path_prefix": "/news/",
+    "category": "IA · Pesquisa",
+    "papel": "primaria",
+    "enabled": true
+  },
+  {
+    "name": "The Batch (DeepLearning.AI)",
+    "homepage_url": "https://www.deeplearning.ai/the-batch/",
+    "type": "sitemap",
+    "sitemap_url": "https://www.deeplearning.ai/sitemap.xml",
+    "path_prefix": "/the-batch/",
+    "exclude": [
+      "/tag/",
+      "/issue-"
+    ],
+    "category": "IA · Notícias",
+    "papel": "descoberta",
+    "enabled": true
   }
 ]
