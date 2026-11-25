@@ -96,6 +96,7 @@ services:
       WUZAPI_URL: ${WUZAPI_URL:-http://radar-wuzapi:8080}
       WUZAPI_TOKEN: ${WUZAPI_TOKEN:-}
       DIGEST_TO: ${DIGEST_TO:-}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}   # escolha e tradução pt-BR com modelo gratuito
 
 volumes:
   radar_pgdata:
