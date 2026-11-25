@@ -142,6 +142,12 @@ def _page_metadata(html: str) -> dict:
             if isinstance(item, dict) and item.get("datePublished"):
                 published = published or item["datePublished"]
     title = meta("og:title", "twitter:title") or (soup.title.get_text(strip=True) if soup.title else "")
+    site = meta("og:site_name") or ""
+    if site:
+        # "Título | Stanford HAI" -> "Título"; página cujo título é só o nome do site não é artigo.
+        title = re.sub(rf"\s*[|\-–—]\s*{re.escape(site)}\s*$", "", title).strip()
+        if title.lower() == site.lower():
+            title = ""
     summary = meta("og:description", "description", "twitter:description") or ""
     return {"title": title, "summary": re.sub(r"\s+", " ", summary)[:700], "published": published}
 
