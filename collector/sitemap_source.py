@@ -83,6 +83,26 @@ def _fix_host(loc: str, homepage: str) -> str:
     return loc
 
 
+def _same_site(url: str, allowed_hosts: set[str]) -> bool:
+    """Só segue URLs http(s) do próprio site da fonte (evita SSRF via sitemap de terceiros)."""
+    parts = urlparse(url)
+    host = (parts.hostname or "").rstrip(".").lower()
+    return parts.scheme in ("http", "https") and host in allowed_hosts
+
+
+def _get_same_site(client, url: str, allowed_hosts: set[str], max_hops: int = 3):
+    """GET seguindo redirecionamentos só enquanto continuarem no mesmo site."""
+    for _ in range(max_hops + 1):
+        resp = client.get(url, follow_redirects=False)
+        if resp.is_redirect:
+            url = str(resp.next_request.url) if resp.next_request else ""
+            if not _same_site(url, allowed_hosts):
+                return None
+            continue
+        return resp
+    return None
+
+
 def _page_metadata(html: str) -> dict:
     soup = BeautifulSoup(html, "html.parser")
 
@@ -116,9 +136,12 @@ def sitemap_entries(client, source: dict, store, user_agent: str, clean_url) -> 
     max_new = source.get("max_new", 10)
     now = datetime.now(timezone.utc)
 
+    allowed_hosts = {(urlparse(u).hostname or "").rstrip(".").lower() for u in (homepage, source["sitemap_url"])}
     candidates = []
     for loc, lastmod in _read_sitemap(client, source["sitemap_url"]):
         loc = _fix_host(loc, homepage)
+        if not _same_site(loc, allowed_hosts):
+            continue
         path = urlparse(loc).path
         if not path.startswith(prefix) or path.rstrip("/") == prefix.rstrip("/"):
             continue
@@ -140,8 +163,8 @@ def sitemap_entries(client, source: dict, store, user_agent: str, clean_url) -> 
         if not _allowed(client, url, user_agent):
             blocked += 1
             continue
-        resp = client.get(url, follow_redirects=True)
-        if resp.status_code != 200:
+        resp = _get_same_site(client, url, allowed_hosts)
+        if resp is None or resp.status_code != 200:
             continue
         info = _page_metadata(resp.text)
         if not info["title"]:
