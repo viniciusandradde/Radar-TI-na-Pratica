@@ -15,6 +15,7 @@ import httpx
 from bs4 import BeautifulSoup
 from dateutil import parser as date_parser
 from sitemap_source import sitemap_entries
+from hn_source import hn_entries
 
 ROOT = os.path.dirname(__file__)
 USER_AGENT = "VSA-Radar/1.0 (+https://github.com/viniciusandradde/Radar-TI-na-Pratica-)"
@@ -146,15 +147,20 @@ def main():
         for source in sources:
             if not source.get("enabled", True): continue
             homepage = source["homepage_url"]
-            if source.get("type") == "sitemap":
+            kind = source.get("type", "rss")
+            if kind in ("sitemap", "hn_api"):
+                origin = source.get("sitemap_url") if kind == "sitemap" else "https://hn.algolia.com/api/v1"
                 try:
-                    got = sitemap_entries(client, source, store, USER_AGENT, clean_url)
+                    if kind == "sitemap":
+                        got = sitemap_entries(client, source, store, USER_AGENT, clean_url)
+                    else:
+                        got = hn_entries(client, source, store, clean_url)
                 except Exception as exc:
-                    print(f"[WARN] sitemap {source['name']}: {exc}")
+                    print(f"[WARN] {kind} {source['name']}: {exc}")
                     errors += 1
-                    details.append({"source": source["name"], "result": "error", "feed_url": source.get("sitemap_url"), "reason": str(exc)[:300]})
+                    details.append({"source": source["name"], "result": "error", "feed_url": origin, "reason": str(exc)[:300]})
                     continue
-                print(f"[SITEMAP] {source['name']} -> {len(got['records'])} novas, {got['duplicate']} já no banco, {got['blocked']} barradas pelo robots.txt")
+                print(f"[{kind.upper()}] {source['name']} -> {len(got['records'])} novas, {got['duplicate']} já no banco, {got['blocked']} barradas pelo robots.txt")
                 stats["feeds_ok"] += 1
                 src_new, src_dup = 0, got["duplicate"]
                 for item in got["records"]:
@@ -172,7 +178,7 @@ def main():
                         errors += 1
                 inserted += got["duplicate"]
                 stats["new"] += src_new; stats["duplicate"] += src_dup
-                details.append({"source": source["name"], "result": "ok", "feed_url": source["sitemap_url"], "new": src_new, "duplicate": src_dup})
+                details.append({"source": source["name"], "result": "ok", "feed_url": origin, "new": src_new, "duplicate": src_dup})
                 continue
             feed_url = source.get("feed_url") or discover_feed(client, homepage)
             if not feed_url:

@@ -35,7 +35,7 @@ services:
   # RSSHub: gera RSS para sites sem feed (Anthropic, Cohere, LangChain, The Batch).
   # Só na rede interna do compose; nenhuma porta no host.
   radar-rsshub:
-    image: diygod/rsshub:latest
+    image: diygod/rsshub:2026-11-24@sha256:f948f601b55357bd78dd4e97f506dffec4ce2775ad14577634ce120da9a9e1df  # fixada; atualizar testando na homologação
     restart: unless-stopped
     mem_limit: 384m
     cpus: 0.5
