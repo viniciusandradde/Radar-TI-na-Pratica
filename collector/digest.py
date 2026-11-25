@@ -12,7 +12,7 @@ Variáveis:
   DIGEST_DRY_RUN=1     só imprime a mensagem, não envia (padrão quando faltar WUZAPI_*)
   DIGEST_MAX=10, DIGEST_PER_TRAIL=3, DIGEST_HOURS=24
   OPENROUTER_API_KEY   chave da OpenRouter (escolha e tradução para pt-BR com modelo gratuito)
-  DIGEST_LLM_MODELS    modelos em ordem de tentativa (padrão: gemma 4 31b, nemotron 3 ultra, ernie 5.5 flash, gemma 4 26b, nemotron 3.5 super, ling 3.2 flash; todos :free)
+  DIGEST_LLM_MODELS    modelos em ordem de tentativa (padrão: nemotron 3 ultra, nemotron 3.5 lightning, gemma 4 31b, ernie 5.5 flash, gemma 4 26b, ling 3.2 flash; todos :free)
 Prioridade: 1) principais LLMs, 2) notícias bombásticas, 3) demais trilhas.
 Sem chave ou se o modelo falhar, usa a seleção por regras e os títulos originais.
 Uso: python digest.py [--dry-run]
@@ -169,7 +169,7 @@ def pick_llm(cands, max_total: int, per_trail: int):
     key = os.environ.get("OPENROUTER_API_KEY")
     if not key or not cands:
         return None
-    models = os.environ.get("DIGEST_LLM_MODELS", "google/gemma-4-31b-it:free,nvidia/nemotron-3-ultra-550b-a55b:free,baidu/ernie-5.5-flash-preview:free,google/gemma-4-26b-a4b-it:free,nvidia/nemotron-3.5-super-vl:free,inclusionai/ling-3.2-flash:free").split(",")
+    models = os.environ.get("DIGEST_LLM_MODELS", "nvidia/nemotron-3-ultra-550b-a55b:free,nvidia/nemotron-3.5-lightning:free,google/gemma-4-31b-it:free,baidu/ernie-5.5-flash-preview:free,google/gemma-4-26b-a4b-it:free,inclusionai/ling-3.2-flash:free").split(",")
     slim = [{k: c[k] for k in ("id", "fonte", "categoria", "grupo", "titulo", "resumo")} for c in cands]
     prompt = LLM_PROMPT.format(n=max_total, per=per_trail, cands=json.dumps(slim, ensure_ascii=False))
     attempts = [(m.strip(), n) for n in range(2) for m in models if m.strip()]  # duas voltas pela lista
