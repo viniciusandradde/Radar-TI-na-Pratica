@@ -770,7 +770,8 @@
     "path_prefix": "/the-batch/",
     "exclude": [
       "/tag/",
-      "/issue-"
+      "/issue-",
+      "/about"
     ],
     "category": "IA · Notícias",
     "papel": "descoberta",
