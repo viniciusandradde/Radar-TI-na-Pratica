@@ -15,7 +15,7 @@ Campos da fonte em sources.json:
 """
 from __future__ import annotations
 
-import gzip
+import zlib
 import json
 import re
 from datetime import datetime, timedelta, timezone
@@ -59,10 +59,29 @@ def _allowed(client, url: str, user_agent: str) -> bool:
     return rp.can_fetch(user_agent, url)
 
 
-def _read_sitemap(client, url: str) -> list[tuple[str, str]]:
-    body = client.get(url, follow_redirects=True).content
+MAX_SITEMAP_BYTES = 20 * 1024 * 1024  # sitemaps grandes reais ficam bem abaixo disso
+
+
+def _download_capped(client, url: str) -> bytes:
+    chunks, size = [], 0
+    with client.stream("GET", url, follow_redirects=True) as resp:
+        resp.raise_for_status()
+        for chunk in resp.iter_raw():
+            size += len(chunk)
+            if size > MAX_SITEMAP_BYTES:
+                raise ValueError("sitemap maior que 20 MB")
+            chunks.append(chunk)
+    body = b"".join(chunks)
     if body[:2] == b"\x1f\x8b":
-        body = gzip.decompress(body)
+        inflater = zlib.decompressobj(16 + zlib.MAX_WBITS)
+        body = inflater.decompress(body, MAX_SITEMAP_BYTES)
+        if inflater.unconsumed_tail:
+            raise ValueError("sitemap descompactado maior que 20 MB")
+    return body
+
+
+def _read_sitemap(client, url: str) -> list[tuple[str, str]]:
+    body = _download_capped(client, url)
     root = ET.fromstring(body)
     if _tag(root) == "sitemapindex":
         raise ValueError("sitemap_url aponta para um índice; informe o sitemap filho")
