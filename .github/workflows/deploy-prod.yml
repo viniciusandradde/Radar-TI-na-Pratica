@@ -57,7 +57,7 @@ jobs:
       - name: Imagem do coletor
         run: |
           docker build -f deploy/collector.Dockerfile -t radar-coletor:ci .
-          docker run --rm --entrypoint python radar-coletor:ci -c "import sys; sys.path.insert(0, '/app/collector'); import collect, sitemap_source, hn_source; print('imports ok')"
+          docker run --rm --entrypoint python radar-coletor:ci -c "import sys; sys.path.insert(0, '/app/collector'); import collect, sitemap_source, hn_source, digest; print('imports ok')"
 
   publicar-producao:
     needs: validar
