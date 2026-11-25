@@ -164,6 +164,8 @@ def main():
                 stats["feeds_ok"] += 1
                 src_new, src_dup = 0, got["duplicate"]
                 for item in got["records"]:
+                    if urlparse(item["link"]).scheme not in ("http", "https"):
+                        continue  # nunca grava javascript:, data: etc. (vale para todo tipo de fonte)
                     record = {"owner_id": owner_id, "source_name": source["name"], "source_url": homepage,
                               "canonical_url": item["link"], "title": item["title"][:500], "summary": item["summary"],
                               "published_at": item["published_at"], "category": source.get("category", "Mercado & Estratégia"),
