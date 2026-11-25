@@ -8,6 +8,12 @@ services:
   radar-db:
     image: postgres:17-alpine
     restart: unless-stopped
+    command: ["postgres", "-c", "shared_buffers=64MB", "-c", "max_connections=30"]
+    mem_limit: 256m
+    cpus: 0.5
+    logging: &logging
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
     environment:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?defina POSTGRES_PASSWORD}
       RADAR_APP_PASSWORD: ${RADAR_APP_PASSWORD:?defina RADAR_APP_PASSWORD}
@@ -31,6 +37,9 @@ services:
       context: ..
       dockerfile: deploy/collector.Dockerfile
     restart: unless-stopped
+    mem_limit: 320m
+    cpus: 0.5
+    logging: *logging
     depends_on:
       radar-db:
         condition: service_healthy
