@@ -1,6 +1,7 @@
 # VSA Radar na VPS (Dokploy: projeto "VSA Radar VPS", compose "Scan").
 # Variáveis (aba Environment do Dokploy, nunca versionadas):
-#   POSTGRES_PASSWORD, RADAR_APP_PASSWORD, RADAR_RO_PASSWORD, RADAR_TS_IP
+#   POSTGRES_PASSWORD, RADAR_APP_PASSWORD, RADAR_RO_PASSWORD, RADAR_TS_IP,
+#   WUZAPI_ADMIN_TOKEN, WUZAPI_GLOBAL_ENCRYPTION_KEY; resumo: DIGEST_ENABLED, WUZAPI_TOKEN, DIGEST_TO
 # Porta do banco: 5436, só em localhost e no IP do Tailscale (nada na internet).
 name: vsa-radar
 
@@ -54,6 +55,24 @@ services:
       retries: 5
       start_period: 30s
 
+  # WuzAPI próprio do Radar: envia o resumo diário no WhatsApp. Painel/QR só em 127.0.0.1:8095.
+  radar-wuzapi:
+    image: asternic/wuzapi:1.1.1@sha256:5cc11e5bf30c09fb27034fad75ad5419bf355e787974f16deb680eceb8627473  # fixada
+    restart: unless-stopped
+    mem_limit: 192m
+    cpus: 0.5
+    logging: *logging
+    environment:
+      WUZAPI_ADMIN_TOKEN: ${WUZAPI_ADMIN_TOKEN:?defina WUZAPI_ADMIN_TOKEN}
+      WUZAPI_GLOBAL_ENCRYPTION_KEY: ${WUZAPI_GLOBAL_ENCRYPTION_KEY:?defina WUZAPI_GLOBAL_ENCRYPTION_KEY}
+      SESSION_DEVICE_NAME: VSA Radar
+      TZ: America/Sao_Paulo
+    volumes:
+      - radar_wuzapi_db:/app/dbdata
+      - radar_wuzapi_files:/app/files
+    ports:
+      - "127.0.0.1:8095:8080"
+
   radar-scheduler:
     build:
       context: ..
@@ -74,9 +93,11 @@ services:
       # Resumo diário no WhatsApp (collector/digest.py). Desligado até DIGEST_ENABLED=1.
       DIGEST_ENABLED: ${DIGEST_ENABLED:-0}
       DIGEST_HOUR: ${DIGEST_HOUR:-7}
-      WUZAPI_URL: ${WUZAPI_URL:-}
+      WUZAPI_URL: ${WUZAPI_URL:-http://radar-wuzapi:8080}
       WUZAPI_TOKEN: ${WUZAPI_TOKEN:-}
       DIGEST_TO: ${DIGEST_TO:-}
 
 volumes:
   radar_pgdata:
+  radar_wuzapi_db:
+  radar_wuzapi_files:

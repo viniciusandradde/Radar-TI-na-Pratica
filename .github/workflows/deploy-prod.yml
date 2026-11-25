@@ -52,6 +52,8 @@ jobs:
           RADAR_APP_PASSWORD: ci
           RADAR_RO_PASSWORD: ci
           RADAR_TS_IP: 127.0.0.2
+          WUZAPI_ADMIN_TOKEN: ci
+          WUZAPI_GLOBAL_ENCRYPTION_KEY: ci
         run: docker compose -f deploy/docker-compose.yml config -q
 
       - name: Imagem do coletor
