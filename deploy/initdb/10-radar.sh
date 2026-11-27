@@ -16,6 +16,7 @@ psql -v ON_ERROR_STOP=1 -U radar_app -d vsa_radar -f /radar/schema.sql
 
 psql -v ON_ERROR_STOP=1 -U radar_app -d vsa_radar <<'SQL'
 grant usage on schema public to radar_ro;
-grant select on all tables in schema public to radar_ro;
-alter default privileges for role radar_app in schema public grant select on tables to radar_ro;
+-- O Media Desk lê só o contrato news_items v1. sources fica para conferência de origem.
+-- Nada de select em todas as tabelas: leads, lead_email_log e app_users têm dado pessoal (LGPD).
+grant select on news_items, sources to radar_ro;
 SQL
