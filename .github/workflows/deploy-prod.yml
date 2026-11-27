@@ -1,0 +1,84 @@
+# Coletor do Radar: valida em todo push e publica na PRODUÇÃO só a partir da main.
+#
+# Fluxo: feature -> homologação (Dokploy local, compose Scan) -> merge na main ->
+# este workflow chama o Dokploy da produção (compose.deploy), que faz git pull e
+# reconstrói. Secrets do repositório: DOKPLOY_PROD_URL, DOKPLOY_PROD_API_KEY,
+# DOKPLOY_PROD_COMPOSE_ID.
+name: coletor — validar e publicar
+
+on:
+  push:
+    paths:
+      - "collector/**"
+      - "deploy/**"
+      - "postgres/**"
+      - ".github/workflows/deploy-prod.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: radar-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fontes (sources.json)
+        run: |
+          python3 - <<'PY'
+          import json, sys
+          src = json.load(open("collector/sources.json"))
+          erros = []
+          nomes = [s.get("name") for s in src]
+          if len(nomes) != len(set(nomes)): erros.append("nome de fonte duplicado")
+          for s in src:
+              tipo = s.get("type", "rss")
+              for campo in ("name", "homepage_url", "category", "papel"):
+                  if not s.get(campo): erros.append(f"{s.get('name')}: falta {campo}")
+              if s.get("papel") not in ("primaria", "descoberta"): erros.append(f"{s['name']}: papel inválido")
+              if tipo == "sitemap" and not (s.get("sitemap_url") and s.get("path_prefix")): erros.append(f"{s['name']}: sitemap sem sitemap_url/path_prefix")
+              if tipo == "hn_api" and not s.get("queries"): erros.append(f"{s['name']}: hn_api sem queries")
+              if tipo not in ("rss", "sitemap", "hn_api"): erros.append(f"{s['name']}: tipo {tipo} desconhecido")
+          print(f"{len(src)} fontes, {sum(s.get('enabled', True) for s in src)} ativas")
+          if erros: print("\n".join(erros)); sys.exit(1)
+          PY
+
+      - name: Compose
+        env:
+          POSTGRES_PASSWORD: ci
+          RADAR_APP_PASSWORD: ci
+          RADAR_RO_PASSWORD: ci
+          RADAR_TS_IP: 127.0.0.2
+          WUZAPI_ADMIN_TOKEN: ci
+          WUZAPI_GLOBAL_ENCRYPTION_KEY: ci
+        run: docker compose -f deploy/docker-compose.yml config -q
+
+      - name: Imagem do coletor
+        run: |
+          docker build -f deploy/collector.Dockerfile -t radar-coletor:ci .
+          docker run --rm --entrypoint python radar-coletor:ci -c "import sys; sys.path.insert(0, '/app/collector'); import collect, sitemap_source, hn_source, digest; print('imports ok')"
+
+  publicar-producao:
+    needs: validar
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: producao
+    steps:
+      - name: Dispara o deploy no Dokploy da produção
+        env:
+          URL: ${{ secrets.DOKPLOY_PROD_URL }}
+          KEY: ${{ secrets.DOKPLOY_PROD_API_KEY }}
+          COMPOSE_ID: ${{ secrets.DOKPLOY_PROD_COMPOSE_ID }}
+        run: |
+          if [ -z "$URL" ] || [ -z "$KEY" ] || [ -z "$COMPOSE_ID" ]; then
+            echo "::error::faltam secrets DOKPLOY_PROD_URL / DOKPLOY_PROD_API_KEY / DOKPLOY_PROD_COMPOSE_ID"; exit 1
+          fi
+          curl -fsS -X POST "$URL/api/compose.deploy" \
+            -H "x-api-key: $KEY" -H "Content-Type: application/json" \
+            -d "{\"composeId\":\"$COMPOSE_ID\",\"title\":\"ci: ${GITHUB_SHA::7}\"}"
+          echo
+          echo "deploy enfileirado no Dokploy da produção (git pull + rebuild); conferir no painel."

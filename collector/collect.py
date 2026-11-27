@@ -14,6 +14,8 @@ import feedparser
 import httpx
 from bs4 import BeautifulSoup
 from dateutil import parser as date_parser
+from sitemap_source import sitemap_entries
+from hn_source import hn_entries
 
 ROOT = os.path.dirname(__file__)
 USER_AGENT = "VSA-Radar/1.0 (+https://github.com/viniciusandradde/Radar-TI-na-Pratica-)"
@@ -74,6 +76,10 @@ class SupabaseStore:
         from supabase import create_client  # imported only when this backend is used
         self.client = create_client(url, key)
 
+    def exists(self, url: str) -> bool:
+        res = self.client.table("news_items").select("id").eq("owner_id", self.owner_id).eq("canonical_url", url).limit(1).execute()
+        return bool(res.data)
+
     def insert(self, record) -> bool | None:
         self.client.table("news_items").upsert(record, on_conflict="owner_id,canonical_url", ignore_duplicates=True).execute()
         return None  # Supabase upsert does not report whether the row was new
@@ -97,6 +103,10 @@ class PostgresStore:
             owner = row[0]
         self.owner_id = str(owner)
         self.run_id = self.conn.execute("insert into collector_runs default values returning id").fetchone()[0]
+
+    def exists(self, url: str) -> bool:
+        return self.conn.execute("select 1 from news_items where owner_id = %s and canonical_url = %s",
+                                 (self.owner_id, url)).fetchone() is not None
 
     def insert(self, record) -> bool:
         # unique(owner_id, canonical_url) keeps repeated runs idempotent; RETURNING tells new vs duplicate.
@@ -137,6 +147,41 @@ def main():
         for source in sources:
             if not source.get("enabled", True): continue
             homepage = source["homepage_url"]
+            kind = source.get("type", "rss")
+            if kind in ("sitemap", "hn_api"):
+                origin = source.get("sitemap_url") if kind == "sitemap" else "https://hn.algolia.com/api/v1"
+                try:
+                    if kind == "sitemap":
+                        got = sitemap_entries(client, source, store, USER_AGENT, clean_url)
+                    else:
+                        got = hn_entries(client, source, store, clean_url)
+                except Exception as exc:
+                    print(f"[WARN] {kind} {source['name']}: {exc}")
+                    errors += 1
+                    details.append({"source": source["name"], "result": "error", "feed_url": origin, "reason": str(exc)[:300]})
+                    continue
+                print(f"[{kind.upper()}] {source['name']} -> {len(got['records'])} novas, {got['duplicate']} já no banco, {got['blocked']} barradas pelo robots.txt")
+                stats["feeds_ok"] += 1
+                src_new, src_dup = 0, got["duplicate"]
+                for item in got["records"]:
+                    if urlparse(item["link"]).scheme not in ("http", "https"):
+                        continue  # nunca grava javascript:, data: etc. (vale para todo tipo de fonte)
+                    record = {"owner_id": owner_id, "source_name": source["name"], "source_url": homepage,
+                              "canonical_url": item["link"], "title": item["title"][:500], "summary": item["summary"],
+                              "published_at": item["published_at"], "category": source.get("category", "Mercado & Estratégia"),
+                              "status": "new"}
+                    try:
+                        is_new = store.insert(record)
+                        inserted += 1
+                        if is_new is True: src_new += 1
+                        elif is_new is False: src_dup += 1
+                    except Exception as exc:
+                        print(f"[ERROR] {source['name']} / {item['title'][:80]}: {exc}")
+                        errors += 1
+                inserted += got["duplicate"]
+                stats["new"] += src_new; stats["duplicate"] += src_dup
+                details.append({"source": source["name"], "result": "ok", "feed_url": origin, "new": src_new, "duplicate": src_dup})
+                continue
             feed_url = source.get("feed_url") or discover_feed(client, homepage)
             if not feed_url:
                 print(f"[SKIP] no RSS/Atom discovered: {source['name']}")

@@ -1,0 +1,104 @@
+# VSA Radar na VPS (Dokploy: projeto "VSA Radar VPS", compose "Scan").
+# Variáveis (aba Environment do Dokploy, nunca versionadas):
+#   POSTGRES_PASSWORD, RADAR_APP_PASSWORD, RADAR_RO_PASSWORD, RADAR_TS_IP,
+#   WUZAPI_ADMIN_TOKEN, WUZAPI_GLOBAL_ENCRYPTION_KEY; resumo: DIGEST_ENABLED, WUZAPI_TOKEN, DIGEST_TO
+# Porta do banco: 5436, só em localhost e no IP do Tailscale (nada na internet).
+name: vsa-radar
+
+services:
+  radar-db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    command: ["postgres", "-c", "shared_buffers=64MB", "-c", "max_connections=30"]
+    mem_limit: 256m
+    cpus: 0.5
+    logging: &logging
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?defina POSTGRES_PASSWORD}
+      RADAR_APP_PASSWORD: ${RADAR_APP_PASSWORD:?defina RADAR_APP_PASSWORD}
+      RADAR_RO_PASSWORD: ${RADAR_RO_PASSWORD:?defina RADAR_RO_PASSWORD}
+      TZ: America/Sao_Paulo
+    volumes:
+      - radar_pgdata:/var/lib/postgresql/data
+      - ./initdb:/docker-entrypoint-initdb.d:ro
+      - ../postgres/schema.sql:/radar/schema.sql:ro
+    ports:
+      - "127.0.0.1:5436:5432"
+      - "${RADAR_TS_IP:?defina RADAR_TS_IP (IP do Tailscale)}:5436:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d vsa_radar"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # RSSHub: gera RSS para sites sem feed (Anthropic, Cohere, LangChain, The Batch).
+  # Só na rede interna do compose; nenhuma porta no host.
+  radar-rsshub:
+    image: diygod/rsshub:2026-11-24@sha256:f948f601b55357bd78dd4e97f506dffec4ce2775ad14577634ce120da9a9e1df  # fixada; atualizar testando na homologação
+    restart: unless-stopped
+    mem_limit: 384m
+    cpus: 0.5
+    logging: *logging
+    environment:
+      NODE_ENV: production
+      CACHE_TYPE: memory
+      CACHE_EXPIRE: "1800"
+      CACHE_CONTENT_EXPIRE: "3600"
+      NODE_OPTIONS: --max-old-space-size=256
+      TZ: America/Sao_Paulo
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS -o /dev/null http://127.0.0.1:1200/healthz || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  # WuzAPI próprio do Radar: envia o resumo diário no WhatsApp. Painel/QR só em 127.0.0.1:8095.
+  radar-wuzapi:
+    image: asternic/wuzapi:1.1.1@sha256:5cc11e5bf30c09fb27034fad75ad5419bf355e787974f16deb680eceb8627473  # fixada
+    restart: unless-stopped
+    mem_limit: 192m
+    cpus: 0.5
+    logging: *logging
+    environment:
+      WUZAPI_ADMIN_TOKEN: ${WUZAPI_ADMIN_TOKEN:?defina WUZAPI_ADMIN_TOKEN}
+      WUZAPI_GLOBAL_ENCRYPTION_KEY: ${WUZAPI_GLOBAL_ENCRYPTION_KEY:?defina WUZAPI_GLOBAL_ENCRYPTION_KEY}
+      SESSION_DEVICE_NAME: VSA Radar
+      TZ: America/Sao_Paulo
+    volumes:
+      - radar_wuzapi_db:/app/dbdata
+      - radar_wuzapi_files:/app/files
+    ports:
+      - "127.0.0.1:8095:8080"
+
+  radar-scheduler:
+    build:
+      context: ..
+      dockerfile: deploy/collector.Dockerfile
+    restart: unless-stopped
+    mem_limit: 320m
+    cpus: 0.5
+    logging: *logging
+    depends_on:
+      radar-db:
+        condition: service_healthy
+      radar-rsshub:
+        condition: service_started
+    environment:
+      RADAR_DATABASE_URL: postgresql://radar_app:${RADAR_APP_PASSWORD}@radar-db:5432/vsa_radar
+      COLLECT_MINUTE: "15"
+      TZ: America/Sao_Paulo
+      # Resumo diário no WhatsApp (collector/digest.py). Desligado até DIGEST_ENABLED=1.
+      DIGEST_ENABLED: ${DIGEST_ENABLED:-0}
+      DIGEST_HOUR: ${DIGEST_HOUR:-7}
+      WUZAPI_URL: ${WUZAPI_URL:-http://radar-wuzapi:8080}
+      WUZAPI_TOKEN: ${WUZAPI_TOKEN:-}
+      DIGEST_TO: ${DIGEST_TO:-}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}   # escolha e tradução pt-BR com modelo gratuito
+
+volumes:
+  radar_pgdata:
+  radar_wuzapi_db:
+  radar_wuzapi_files:
